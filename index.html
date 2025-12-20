@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Debloater Tool</title>
+    <style>
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white ;
+            margin: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: black;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: black;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: gray;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-5px);
+        }
+
+        .btn-danger {
+            background: gray;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background:whitesmoke;
+            color: black;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            opacity: 0.9;
+        }
+
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+        }
+
+        .package-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .package-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .package-item.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .package-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .package-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .package-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .package-category {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .script-output {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .script-output.show {
+            display: block;
+        }
+
+        .script-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .package-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧹 A06 Debloat Interface</h1>
+            <p>Select packages to remove bloatware from your device</p>
+        </div>
+
+        <div class="content">
+            <div class="instructions">
+                <h3>📋 How to Use:</h3>
+                <ol>
+                    <li>Select the packages you want to remove by clicking on them</li>
+                    <li>Click "Generate ADB Script" to create the removal commands</li>
+                    <li>Enable <code>USB Debugging</code> on your Android device</li>
+                    <li>Connect your device to PC and run: <code>adb devices</code></li>
+                    <li>Copy and paste the generated commands into your terminal</li>
+                    <li><strong>Note:</strong> Some packages may require root access</li>
+                </ol>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number" id="totalCount">0</div>
+                    <div class="label">Total Packages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="selectedCount">0</div>
+                    <div class="label">Selected</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search packages...">
+                </div>
+                <button class="btn btn-primary" onclick="selectAll()">Select All</button>
+                <button class="btn btn-danger" onclick="deselectAll()">Deselect All</button>
+                <button class="btn btn-success" onclick="generateScript()">Generate ADB Script</button>
+            </div>
+
+            <div class="package-grid" id="packageGrid"></div>
+
+            <div class="script-output" id="scriptOutput">
+                <h3>Generated ADB Commands:</h3>
+                <div class="script-box" id="scriptBox"></div>
+                <button class="btn btn-success copy-btn" onclick="copyScript()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="credits">
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9em; color: #666;">
+            Developed by Chukamso , Alphanox87 | GitHub:<br>
+            Special thanks to Physwizz for his original debloater script.
+    </div>
+
+    <script>
+        <!--u can add or remove packages anyhow u like from here-->
+        const packages = [
+            { name: 'com.google.android.adservices.api', category: 'Google Ads' },
+            { name: 'com.google.android.projection.gearhead', category: 'Android Auto' },
+            { name: 'com.google.android.setupwizard', category: 'Setup Wizard' },
+            { name: 'com.google.android.apps.restore', category: 'Google Restore' },
+            { name: 'com.google.android.as', category: 'Google Services' },
+            { name: 'com.samsung.android.sm.devicesecurity', category: 'Samsung Security' },
+            { name: 'com.samsung.android.app.updatecenter', category: 'Samsung Updates' },
+            { name: 'com.aura.oobe.samsung.gl', category: 'Samsung OOBE' },
+            { name: 'com.samsung.android.mapsagent', category: 'Samsung Maps' },
+            { name: 'com.samsung.android.rampart', category: 'Samsung Rampart' },
+            { name: 'com.samsung.android.bbc.bbcagent', category: 'Samsung BBC Agent' },
+            { name: 'com.android.providers.blockednumber', category: 'Blocked Numbers' },
+            { name: 'com.sec.android.app.bluetoothagent', category: 'Bluetooth Agent' },
+            { name: 'com.android.bluetoothmidiservice', category: 'Bluetooth MIDI' },
+            { name: 'com.samsung.android.mdecservice', category: 'Samsung MDEC' },
+            { name: 'com.android.calllogbackup', category: 'Call Log Backup' },
+            { name: 'com.android.cameraextensions', category: 'Camera Extensions' },
+            { name: 'com.sec.android.CcInfo', category: 'CC Info' },
+            { name: 'com.sec.android.app.chromecustomizations', category: 'Chrome Custom' },
+            { name: 'com.android.cts.ctsshim', category: 'CTS Shim' },
+            { name: 'com.google.android.ondevicepersonalization.services', category: 'Personalization' },
+            { name: 'com.android.ons', category: 'ONS Service' },
+            { name: 'com.android.providers.partnerbookmarks', category: 'Partner Bookmarks' },
+            { name: 'com.android.virtualmachine.res', category: 'Virtual Machine' },
+            { name: 'com.google.android.federatedcompute', category: 'Federated Compute' },
+            { name: 'com.google.android.overlay.gmsconfig.asi', category: 'GMS Overlay' },
+            { name: 'com.google.android.overlay.gmsconfig.photos', category: 'Photos Overlay' },
+            { name: 'com.google.android.overlay.modules.captiveportallogin.forframework', category: 'Captive Portal' },
+            { name: 'com.google.android.overlay.modules.documentsui', category: 'Documents UI' },
+            { name: 'com.google.android.overlay.modules.permissioncontroller', category: 'Permissions' },
+            { name: 'com.mediatek.entitlement.o2', category: 'MediaTek O2' },
+            { name: 'com.mediatek.gbaservice', category: 'MediaTek GBA' },
+            { name: 'com.mediatek.MtkSettingsResOverlay', category: 'MediaTek Settings' },
+            { name: 'com.mediatek.systemuiresoverlay', category: 'MediaTek System UI' },
+            { name: 'com.samsung.android.knox.attestation', category: 'Knox Attestation' },
+            { name: 'com.samsung.android.smartswitchassistant', category: 'Smart Switch' },
+            { name: 'com.sec.android.app.camerasaver', category: 'Camera Saver' },
+            { name: 'com.sec.android.app.qsfastpairoverlay', category: 'Fast Pair' },
+            { name: 'com.sec.bcservice', category: 'BC Service' },
+            { name: 'com.sec.epdg', category: 'ePDG' },
+            { name: 'com.sec.phone', category: 'Phone Service' },
+            { name: 'android.autoinstalls.config.samsung', category: 'Auto Installs' },
+            { name: 'com.samsung.android.mcfds', category: 'Samsung MCFDS' },
+            { name: 'com.samsung.android.rubin.app', category: 'Samsung Rubin' },
+            { name: 'com.mediatek.datachannel.service', category: 'Data Channel' },
+            { name: 'com.sec.android.app.factorykeystring', category: 'Factory Key' },
+            { name: 'com.sec.android.diagmonagent', category: 'Diag Monitor' },
+            { name: 'com.samsung.android.dqagent', category: 'DQ Agent' },
+            { name: 'com.samsung.android.dsms', category: 'DSMS' },
+            { name: 'com.sec.android.app.safetyassurance', category: 'Safety Assurance' },
+            { name: 'com.samsung.android.emergency', category: 'Emergency' },
+            { name: 'com.sec.enterprise.knox.cloudmdm.smdms', category: 'Knox MDM' },
+            { name: 'com.sec.epdgtestapp', category: 'ePDG Test' },
+            { name: 'com.samsung.android.app.telephonyui.esimclient', category: 'eSIM Client' },
+            { name: 'com.samsung.android.bluelightfilter', category: 'Blue Light Filter' },
+            { name: 'com.samsung.android.fmm', category: 'Find My Mobile' },
+            { name: 'com.samsung.android.dbsc', category: 'DBSC' },
+            { name: 'com.samsung.storyservice', category: 'Story Service' },
+            { name: 'com.google.android.gms.location.history', category: 'Location History' },
+            { name: 'com.google.android.onetimeinitializer', category: 'One Time Init' },
+            { name: 'com.google.android.partnersetup', category: 'Partner Setup' },
+            { name: 'com.google.android.apps.carrier.carrierwifi', category: 'Carrier WiFi' },
+            { name: 'com.samsung.android.mobileservice', category: 'Mobile Service' },
+            { name: 'com.samsung.android.sdk.handwriting', category: 'Handwriting SDK' },
+            { name: 'com.google.android.healthconnect.controller', category: 'Health Connect' },
+            { name: 'com.hiya.star', category: 'Hiya Caller ID' },
+            { name: 'com.sec.android.iaft', category: 'IAFT' },
+            { name: 'com.sec.imslogger', category: 'IMS Logger' },
+            { name: 'com.samsung.android.knox.containercore', category: 'Knox Container' },
+            { name: 'com.samsung.android.knox.kfbp', category: 'Knox KFBP' },
+            { name: 'com.knox.vpn.proxyhandler', category: 'Knox VPN' },
+            { name: 'com.samsung.android.knox.zt.framework', category: 'Knox ZT' },
+            { name: 'com.samsung.android.knox.kpecore', category: 'Knox KPE' },
+            { name: 'com.google.mainline.adservices', category: 'Mainline Ads' },
+            { name: 'com.google.android.feedback', category: 'Google Feedback' },
+            { name: 'com.samsung.android.mdm', category: 'Samsung MDM' },
+            { name: 'com.mediatek.mdmconfig', category: 'MediaTek MDM' },
+            { name: 'com.google.android.apps.tachyon', category: 'Google Duo' },
+            { name: 'com.facebook.system', category: 'Facebook System' },
+            { name: 'com.facebook.appmanager', category: 'Facebook Manager' },
+            { name: 'com.facebook.services', category: 'Facebook Services' },
+            { name: 'com.samsung.android.server.wifi.mobilewips', category: 'Mobile WIPS' },
+            { name: 'com.samsung.android.networkdiagnostic', category: 'Network Diagnostic' },
+            { name: 'com.android.role.notes.enabled', category: 'Notes Role' },
+            { name: 'com.sec.vsim.ericssonnsds.webapp', category: 'Virtual SIM' },
+            { name: 'com.microsoft.skydrive', category: 'OneDrive' },
+            { name: 'com.mediatek.op07.wfo', category: 'MediaTek WiFi' },
+            { name: 'com.samsung.android.app.parentalcare', category: 'Parental Care' },
+            { name: 'com.sec.android.app.personalization', category: 'Personalization' },
+            { name: 'com.samsung.crane', category: 'Samsung Crane' },
+            { name: 'com.google.android.printservice.recommendation', category: 'Print Service' },
+            { name: 'com.google.android.as.oss', category: 'Google OSS' },
+            { name: 'com.samsung.android.app.sharelive', category: 'Share Live' },
+            { name: 'com.samsung.android.aware.service', category: 'Aware Service' },
+            { name: 'com.samsung.android.mdx.kit', category: 'MDX Kit' },
+            { name: 'com.samsung.android.app.omcagent', category: 'OMC Agent' },
+            { name: 'com.android.rkpdapp', category: 'RKPD' },
+            { name: 'com.sec.app.RilErrorNotifier', category: 'RIL Error' },
+            { name: 'com.samsung.safetyinformation', category: 'Safety Info' },
+            { name: 'com.sec.android.app.billing', category: 'Samsung Billing' },
+            { name: 'com.sec.android.sdhms', category: 'SDHMS' },
+            { name: 'com.samsung.android.intellivoiceservice', category: 'Intelli Voice' },
+            { name: 'com.samsung.android.honeyboard', category: 'Samsung Keyboard' },
+            { name: 'com.samsung.android.kidsinstaller', category: 'Kids Installer' },
+            { name: 'com.sec.spp.push', category: 'SPP Push' },
+            { name: 'com.samsung.oda.service', category: 'ODA Service' },
+            { name: 'com.samsung.android.samsungpositioning', category: 'Samsung Positioning' },
+            { name: 'com.samsung.aasaservice', category: 'AASA Service' },
+            { name: 'com.sec.android.app.servicemodeapp', category: 'Service Mode' },
+            { name: 'com.sec.android.RilServiceModeApp', category: 'RIL Service Mode' },
+            { name: 'com.sec.location.nfwlocationprivacy', category: 'Location Privacy' },
+            { name: 'com.samsung.android.sdm.config', category: 'SDM Config' },
+            { name: 'com.samsung.android.shortcutbackupservice', category: 'Shortcut Backup' },
+            { name: 'com.silead.fingerprint', category: 'Silead Fingerprint' },
+            { name: 'com.sec.modem.settings', category: 'Modem Settings' },
+            { name: 'com.skms.android.agent', category: 'SKMS Agent' },
+            { name: 'com.samsung.android.smartcallprovider', category: 'Smart Call' },
+            { name: 'com.sec.android.easyMover', category: 'Easy Mover' },
+            { name: 'com.sec.android.easyMover.Agent', category: 'Easy Mover Agent' },
+            { name: 'com.samsung.android.visualars', category: 'Visual AR' },
+            { name: 'com.samsung.android.service.stplatform', category: 'ST Platform' },
+            { name: 'com.samsung.sait.sohservice', category: 'SOH Service' },
+            { name: 'com.sec.android.app.soundalive', category: 'Sound Alive' },
+            { name: 'com.google.mainline.telemetry', category: 'Mainline Telemetry' },
+            { name: 'com.google.android.gms.supervision', category: 'GMS Supervision' },
+            { name: 'com.android.traceur', category: 'System Tracing' },
+            { name: 'com.samsung.android.app.watchmanagerstub', category: 'Watch Manager' },
+            { name: 'com.sec.android.daemonapp', category: 'Daemon App' },
+            { name: 'com.google.android.cellbroadcastreceiver', category: 'Cell Broadcast' },
+            { name: 'com.android.managedprovisioning', category: 'Managed Provisioning' },
+            { name: 'com.google.android.youtube', category: 'YouTube' }
+        ];
+
+        let selectedPackages = new Set();
+
+        function initializeApp() {
+            renderPackages();
+            updateStats();
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+        }
+
+        function renderPackages(filter = '') {
+            const grid = document.getElementById('packageGrid');
+            const filteredPackages = packages.filter(pkg => 
+                pkg.name.toLowerCase().includes(filter.toLowerCase()) ||
+                pkg.category.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            grid.innerHTML = filteredPackages.map(pkg => `
+                <div class="package-item ${selectedPackages.has(pkg.name) ? 'selected' : ''}" 
+                     onclick="togglePackage('${pkg.name}')">
+                    <input type="checkbox" 
+                           ${selectedPackages.has(pkg.name) ? 'checked' : ''} 
+                           onclick="event.stopPropagation(); togglePackage('${pkg.name}')">
+                    <div class="package-info">
+                        <div class="package-name">${pkg.name}</div>
+                        <div class="package-category">${pkg.category}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('totalCount').textContent = filteredPackages.length;
+        }
+
+        function togglePackage(packageName) {
+            if (selectedPackages.has(packageName)) {
+                selectedPackages.delete(packageName);
+            } else {
+                selectedPackages.add(packageName);
+            }
+            renderPackages(document.getElementById('searchInput').value);
+            updateStats();
+        }
+
+        function selectAll() {
+            const filter = document.getElementById('searchInput').value;
+            const filteredPackages = packages.filter(pkg => 
+                pkg.name.toLowerCase().includes(filter.toLowerCase()) ||
+                pkg.category.toLowerCase().includes(filter.toLowerCase())
+            );
+            filteredPackages.forEach(pkg => selectedPackages.add(pkg.name));
+            renderPackages(filter);
+            updateStats();
+        }
+
+        function deselectAll() {
+            selectedPackages.clear();
+            renderPackages(document.getElementById('searchInput').value);
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('selectedCount').textContent = selectedPackages.size;
+        }
+
+        function handleSearch(e) {
+            renderPackages(e.target.value);
+        }
+
+        function generateScript() {
+            if (selectedPackages.size === 0) {
+                alert('Please select at least one package!');
+                return;
+            }
+
+            const commands = Array.from(selectedPackages).map(pkg => 
+                `adb shell pm uninstall --user 0 ${pkg}`
+            ).join('\n');
+
+            const fullScript = `# Android Debloater Script
+# Generated: ${new Date().toLocaleString()}
+# Total packages to remove: ${selectedPackages.size}
+
+# Make sure ADB is installed and device is connected
+# Run: adb devices (to verify connection)
+
+${commands}
+
+# Alternative method (if above doesn't work):
+# Use 'adb shell pm disable-user --user 0 <package>' instead
+
+echo "Debloating complete!"`;
+
+            document.getElementById('scriptBox').textContent = fullScript;
+            document.getElementById('scriptOutput').classList.add('show');
+            document.getElementById('scriptOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyScript() {
+            const scriptText = document.getElementById('scriptBox').textContent;
+            navigator.clipboard.writeText(scriptText).then(() => {
+                alert('Script copied to clipboard!');
+            });
+        }
+
+        initializeApp();
+    </script>
+</body>
+</html>
